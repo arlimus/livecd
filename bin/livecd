@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-def exists_vm( name )
+def list_vms
   `vboxmanage list vms`.
      split("\n").
      # match each line to the regex we expect
@@ -9,8 +9,12 @@ def exists_vm( name )
      compact.
      # get the first match
      map{|x| x[1]}.
-     # see if our name exists
-     include?(name)
+     # find all those that have the prefix
+     find_all{|x| x.start_with? $vm_prefix }
+end
+
+def exists_vm( name )
+  list_vms.include? name
 end
 
 def stop_vm( name )
@@ -38,7 +42,7 @@ def run_iso( name, iso )
 end
 
 
-vm_name = 'livecd'
+$vm_prefix = 'livecd-'
 command = ARGV[0]
 
 case command.to_s
