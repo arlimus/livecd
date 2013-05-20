@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+def exists_vm( name )
+  `vboxmanage list vms`.
+     split("\n").
+     # match each line to the regex we expect
+     map{|x| /^"([^"]*)" {[^}]*}/.match(x)}.
+     # remove nil's
+     compact.
+     # get the first match
+     map{|x| x[1]}.
+     # see if our name exists
+     include?(name)
+end
+
+def stop_vm( name )
+  # if it exists:
+  if exists_vm(name)
+    `vboxmanage controlvm #{name} poweroff`
+    `vboxmanage unregistervm #{name} --delete`
+  end
+end
+
+def start_vm( name, iso )
+  # create the new vm
+  `vboxmanage createvm --name #{name} --register`
+  `vboxmanage modifyvm #{name} --ostype "Other"`
+  `vboxmanage storagectl #{name} --name "IDE Controller" --add ide --bootable on`
+  `vboxmanage storageattach #{name} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
+  `vboxmanage modifyvm #{name} --nic1 nat`
+  `vboxmanage modifyvm #{name} --nic2 hostonly --hostonlyadapter2 vboxnet0`
+  `vboxmanage startvm #{name}`
+end
+
+def run_iso( name, iso )
+  stop_vm name
+  start_vm name, iso
+end
+
+
+vm_name = 'livecd'
+command = ARGV[0]
+
+case command.to_s
+  when 'start'
+    iso=File::expand_path( ARGV[1] )
+    run_iso(vm_name,iso)
+  when 'stop'
+    stop_vm(vm_name)
+  else
+    puts "usage: #{$0} (start|stop) <iso>"
+end
+
