@@ -86,7 +86,7 @@ case command.to_s
     iso=File::expand_path( ARGV[1] )
     run_iso(iso)
   when 'stop'
-    (ARGV[1].nil?) ? stop_all_vms : stop_vm(vm_name)
+    (ARGV[1].nil?) ? stop_all_vms : stop_vm(ARGV[1])
   when 'list'
     vms = list_vms
     (vms.empty?) ? puts("no livecd vms found") : puts(vms)
