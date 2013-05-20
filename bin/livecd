@@ -41,8 +41,39 @@ def start_vm( name, iso )
   `vboxmanage startvm #{name}`
 end
 
-def run_iso( name, iso )
-  stop_vm name
+def find_name_for( iso )
+  base = File::basename iso, '.iso'
+  allowed_chars = /[a-z0-9_+-]+/i
+  name = $vm_prefix + base.scan(allowed_chars).join('')
+
+  vms = list_vms
+  return name if not vms.include? name
+
+  # so, name already exists, find an alternative
+  # collect the existing digits we have already assigned first:
+  digits = vms.
+    # whatever fits our naming pattern
+    find_all{|v| v.start_with? name}.
+    # remove the prefix name
+    map{|v| v.sub(name, '')}.
+    # try to match the postfix to -[0-9]+ digits
+    map{|v| v.match /^-([0-9]+)$/}.
+    # remove all nonmatching
+    compact.
+    # get the digits
+    map{|v| v[1].to_i}.sort
+
+  # search for the first free digit
+  i = 1
+  while digits.include? i
+    i += 1
+  end
+  "#{name}-#{i}"
+end
+
+def run_iso( iso )
+  name = find_name_for iso
+  puts "starting vm #{name} (#{iso})"
   start_vm name, iso
 end
 
