@@ -91,10 +91,10 @@ case command.to_s
     vms = list_vms
     (vms.empty?) ? puts("no livecd vms found") : puts(vms)
   else
-    puts "usage: #{$0} (start|stop|list)"
+    puts "usage: livecd (start|stop|list)"
     puts "examples: "
-    puts "       #{$0} start myos.iso"
-    puts "       #{$0} list"
-    puts "       #{$0} stop livecd-myos"
-    puts "       #{$0} stop"
+    puts "       livecd start myos.iso"
+    puts "       livecd list"
+    puts "       livecd stop livecd-myos"
+    puts "       livecd stop"
 end
