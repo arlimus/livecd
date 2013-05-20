@@ -19,10 +19,15 @@ end
 
 def stop_vm( name )
   # if it exists:
+  puts "stopping vm #{name}"
   if exists_vm(name)
     `vboxmanage controlvm #{name} poweroff`
     `vboxmanage unregistervm #{name} --delete`
   end
+end
+
+def stop_all_vms
+  list_vms.each{|vm| stop_vm(vm)}
 end
 
 def start_vm( name, iso )
@@ -48,9 +53,9 @@ command = ARGV[0]
 case command.to_s
   when 'start'
     iso=File::expand_path( ARGV[1] )
-    run_iso(vm_name,iso)
+    run_iso(iso)
   when 'stop'
-    stop_vm(vm_name)
+    (ARGV[1].nil?) ? stop_all_vms : stop_vm(vm_name)
   else
     puts "usage: #{$0} (start|stop) <iso>"
 end
