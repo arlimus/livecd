@@ -12,7 +12,7 @@ livecd list
 livecd stop
 ```
 
-You can also run multiple cds:
+Run multiple livecds at the same time:
 
 ```bash
 livecd start cd_a.iso
