@@ -32,7 +32,7 @@ def stop_all_vms
   list_vms.each{|vm| stop_vm(vm)}
 end
 
-def start_vm( name, iso )
+def start_vm( name, iso, headless = false )
   # create the new vm
   `vboxmanage createvm --name #{name} --register`
   `vboxmanage modifyvm #{name} --ostype "Other"`
@@ -40,7 +40,8 @@ def start_vm( name, iso )
   `vboxmanage storageattach #{name} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
   `vboxmanage modifyvm #{name} --nic1 nat`
   `vboxmanage modifyvm #{name} --nic2 hostonly --hostonlyadapter2 vboxnet0`
-  `vboxmanage startvm #{name}`
+  hl = (headless) ? '--type headless' : ''
+  `vboxmanage startvm #{name} #{hl}`
 end
 
 def find_name_for( iso )
@@ -73,10 +74,10 @@ def find_name_for( iso )
   "#{name}-#{i}"
 end
 
-def run_iso( iso )
+def run_iso( iso, opts )
   name = find_name_for iso
   puts "starting vm #{name} (#{iso})"
-  start_vm name, iso
+  start_vm name, iso, opts[:headless]
 end
 
 
@@ -93,6 +94,11 @@ optparse = OptionParser.new do|opts|
     "       livecd stop livecd-myos\n"+
     "       livecd stop\n"+
     "\n"
+
+  options[:headless] = false
+  opts.on( '-l', '--headless', 'Run VM in headless mode' ) do
+   options[:headless] = true
+  end
 
   # This displays the help screen, all programs are
   # assumed to have this option.
@@ -112,7 +118,7 @@ command = ARGV[0]
 case command.to_s
   when 'start'
     iso=File::expand_path( ARGV[1] )
-    run_iso(iso)
+    run_iso(iso, options)
   when 'stop'
     (ARGV[1].nil?) ? stop_all_vms : stop_vm($vm_prefix + ARGV[1])
   when 'list'
