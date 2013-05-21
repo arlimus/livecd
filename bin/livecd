@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'optparse'
+
 def list_vms
   `vboxmanage list vms`.
      split("\n").
@@ -78,8 +80,34 @@ def run_iso( iso )
 end
 
 
+options = {}
+
+optparse = OptionParser.new do|opts|
+  # Set a banner, displayed at the top
+  # of the help screen.
+  opts.banner =
+    "usage: livecd (start|stop|list) <vm> [options]\n\n"+
+    "examples: \n"+
+    "       livecd start myos.iso\n"+
+    "       livecd list\n"+
+    "       livecd stop livecd-myos\n"+
+    "       livecd stop\n"+
+    "\n"
+
+  # This displays the help screen, all programs are
+  # assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen' ) do
+   puts opts
+   exit
+  end
+end
+
+# parse commandline options
+optparse.parse!
+
 $vm_prefix = 'livecd-'
 command = ARGV[0]
+
 
 case command.to_s
   when 'start'
@@ -95,10 +123,5 @@ case command.to_s
       puts vms.map{|v| v.sub($vm_prefix,'')}
     end
   else
-    puts "usage: livecd (start|stop|list)"
-    puts "examples: "
-    puts "       livecd start myos.iso"
-    puts "       livecd list"
-    puts "       livecd stop livecd-myos"
-    puts "       livecd stop"
+    puts optparse
 end
