@@ -7,7 +7,7 @@ Run a livecd quickly and easily. Uses virtualbox for magic.
 livecd start myos.iso
 
 livecd list
-# livecd-myos
+# myos
 
 livecd stop
 ```
@@ -20,11 +20,11 @@ livecd start cd_a.iso
 livecd start cd_b.iso
 
 livecd list
-# livecd-cd_a
-# livecd-cd_a-1
-# livecd-cd_b
+# cd_a
+# cd_a-1
+# cd_b
 
-livecd stop livecd-cd_a
+livecd stop cd_a
 # or stop all:
 livecd stop
 ```
