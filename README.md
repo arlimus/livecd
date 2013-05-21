@@ -11,3 +11,20 @@ livecd list
 
 livecd stop
 ```
+
+You can also run multiple cds:
+
+```bash
+livecd start cd_a.iso
+livecd start cd_a.iso
+livecd start cd_b.iso
+
+livecd list
+# livecd-cd_a
+# livecd-cd_a-1
+# livecd-cd_b
+
+livecd stop cd_a
+# or stop all:
+livecd stop
+```
