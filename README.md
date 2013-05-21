@@ -24,7 +24,7 @@ livecd list
 # livecd-cd_a-1
 # livecd-cd_b
 
-livecd stop cd_a
+livecd stop livecd-cd_a
 # or stop all:
 livecd stop
 ```
