@@ -1,104 +1,31 @@
 #!/usr/bin/env ruby
 
-def list_vms
-  `vboxmanage list vms`.
-     split("\n").
-     # match each line to the regex we expect
-     map{|x| /^"([^"]*)" {[^}]*}/.match(x)}.
-     # remove nil's
-     compact.
-     # get the first match
-     map{|x| x[1]}.
-     # find all those that have the prefix
-     find_all{|x| x.start_with? $vm_prefix }
-end
+require 'thor'
+require '../lib/livecd'
 
-def exists_vm( name )
-  list_vms.include? name
-end
+class LivecdCLI < Thor
+  include Livecd
 
-def stop_vm( name )
-  # if it exists:
-  puts "stopping vm #{name}"
-  if exists_vm(name)
-    `vboxmanage controlvm #{name} poweroff`
-    `vboxmanage unregistervm #{name} --delete`
+  desc "start <mycd.iso>", "start the iso livecd"
+  def start(file)
+    iso = File::expand_path( file )
+    run_iso(iso, options)
   end
-end
 
-def stop_all_vms
-  list_vms.each{|vm| stop_vm(vm)}
-end
-
-def start_vm( name, iso )
-  # create the new vm
-  `vboxmanage createvm --name #{name} --register`
-  `vboxmanage modifyvm #{name} --ostype "Other"`
-  `vboxmanage storagectl #{name} --name "IDE Controller" --add ide --bootable on`
-  `vboxmanage storageattach #{name} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
-  `vboxmanage modifyvm #{name} --nic1 nat`
-  `vboxmanage modifyvm #{name} --nic2 hostonly --hostonlyadapter2 vboxnet0`
-  `vboxmanage startvm #{name}`
-end
-
-def find_name_for( iso )
-  base = File::basename iso, '.iso'
-  allowed_chars = /[a-z0-9_+-]+/i
-  name = $vm_prefix + base.scan(allowed_chars).join('')
-
-  vms = list_vms
-  return name if not vms.include? name
-
-  # so, name already exists, find an alternative
-  # collect the existing digits we have already assigned first:
-  digits = vms.
-    # whatever fits our naming pattern
-    find_all{|v| v.start_with? name}.
-    # remove the prefix name
-    map{|v| v.sub(name, '')}.
-    # try to match the postfix to -[0-9]+ digits
-    map{|v| v.match /^-([0-9]+)$/}.
-    # remove all nonmatching
-    compact.
-    # get the digits
-    map{|v| v[1].to_i}.sort
-
-  # search for the first free digit
-  i = 1
-  while digits.include? i
-    i += 1
+  desc "stop [<mycd>]", "stop a running livecd or stop all running livecds"
+  def stop(name = nil)
+    (name.nil?) ? stop_all_vms : stop_vm(name)
   end
-  "#{name}-#{i}"
-end
 
-def run_iso( iso )
-  name = find_name_for iso
-  puts "starting vm #{name} (#{iso})"
-  start_vm name, iso
-end
-
-
-$vm_prefix = 'livecd-'
-command = ARGV[0]
-
-case command.to_s
-  when 'start'
-    iso=File::expand_path( ARGV[1] )
-    run_iso(iso)
-  when 'stop'
-    (ARGV[1].nil?) ? stop_all_vms : stop_vm($vm_prefix + ARGV[1])
-  when 'list'
+  desc "list","list all running livecds"
+  def list
     vms = list_vms
     if (vms.empty?)
       puts("no livecd vms found")
     else
-      puts vms.map{|v| v.sub($vm_prefix,'')}
+      puts vms
     end
-  else
-    puts "usage: livecd (start|stop|list)"
-    puts "examples: "
-    puts "       livecd start myos.iso"
-    puts "       livecd list"
-    puts "       livecd stop livecd-myos"
-    puts "       livecd stop"
+  end
 end
+
+LivecdCLI.start(ARGV)
