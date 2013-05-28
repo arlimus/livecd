@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'thor'
-require '../lib/livecd'
+require 'livecd'
 
 class LivecdCLI < Thor
   include Livecd
