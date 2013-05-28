@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
 
 def list_vms
   `vboxmanage list vms`.
      split("\n").
      # match each line to the regex we expect
-     map{|x| /^"([^"]*)" {[^}]*}/.match(x)}.
+     map{|x| /^"([^"]+)" {[^}]*}/.match(x)}.
      # remove nil's
      compact.
      # get the first match
@@ -80,54 +79,32 @@ def run_iso( iso, opts )
   start_vm name, iso, opts[:headless]
 end
 
-
-options = {}
-
-optparse = OptionParser.new do|opts|
-  # Set a banner, displayed at the top
-  # of the help screen.
-  opts.banner =
-    "usage: livecd (start|stop|list) <vm> [options]\n\n"+
-    "examples: \n"+
-    "       livecd start myos.iso\n"+
-    "       livecd list\n"+
-    "       livecd stop livecd-myos\n"+
-    "       livecd stop\n"+
-    "\n"
-
-  options[:headless] = false
-  opts.on( '-l', '--headless', 'Run VM in headless mode' ) do
-   options[:headless] = true
-  end
-
-  # This displays the help screen, all programs are
-  # assumed to have this option.
-  opts.on( '-h', '--help', 'Display this screen' ) do
-   puts opts
-   exit
-  end
-end
-
-# parse commandline options
-optparse.parse!
-
 $vm_prefix = 'livecd-'
-command = ARGV[0]
 
 
-case command.to_s
-  when 'start'
-    iso=File::expand_path( ARGV[1] )
+require 'thor'
+
+class LivecdCLI < Thor
+  desc "start <mycd.iso>", "start the iso livecd"
+  def start(file)
+    iso = File::expand_path( file )
     run_iso(iso, options)
-  when 'stop'
-    (ARGV[1].nil?) ? stop_all_vms : stop_vm($vm_prefix + ARGV[1])
-  when 'list'
+  end
+
+  desc "stop [<mycd>]", "stop a running livecd or stop all running livecds"
+  def stop(name = nil)
+    (name.nil?) ? stop_all_vms : stop_vm($vm_prefix + name)
+  end
+
+  desc "list","list all running livecds"
+  def list
     vms = list_vms
     if (vms.empty?)
       puts("no livecd vms found")
     else
       puts vms.map{|v| v.sub($vm_prefix,'')}
     end
-  else
-    puts optparse
+  end
 end
+
+LivecdCLI.start(ARGV)
