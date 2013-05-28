@@ -14,7 +14,7 @@ class LivecdCLI < Thor
 
   desc "stop [<mycd>]", "stop a running livecd or stop all running livecds"
   def stop(name = nil)
-    (name.nil?) ? stop_all_vms : stop_vm(Livecd::VM_PREFIX + name)
+    (name.nil?) ? stop_all_vms : stop_vm(name)
   end
 
   desc "list","list all running livecds"
@@ -23,7 +23,7 @@ class LivecdCLI < Thor
     if (vms.empty?)
       puts("no livecd vms found")
     else
-      puts vms.map{|v| v.sub(Livecd::VM_PREFIX,'')}
+      puts vms
     end
   end
 end

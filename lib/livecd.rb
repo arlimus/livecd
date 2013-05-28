@@ -12,19 +12,21 @@ module Livecd
        # get the first match
        map{|x| x[1]}.
        # find all those that have the prefix
-       find_all{|x| x.start_with? VM_PREFIX }
+       find_all{|x| x.start_with? VM_PREFIX }.
+       # remove the prefix
+       map{|x| x.sub VM_PREFIX, '' }
   end
 
-  def exists_vm( name )
+  def exists_vm?( name )
     list_vms.include? name
   end
 
   def stop_vm( name )
     # if it exists:
     puts "stopping vm #{name}"
-    if exists_vm(name)
-      `vboxmanage controlvm #{name} poweroff`
-      `vboxmanage unregistervm #{name} --delete`
+    if exists_vm?(name)
+      `vboxmanage controlvm #{id(name)} poweroff`
+      `vboxmanage unregistervm #{id(name)} --delete`
     end
   end
 
@@ -32,22 +34,30 @@ module Livecd
     list_vms.each{|vm| stop_vm(vm)}
   end
 
-  def start_vm( name, iso, headless = false )
+  def run_iso( iso, opts )
+    name = find_name_for iso
+    puts "starting vm #{name} (#{iso})"
+    start_vm id(name), iso, opts[:headless]
+  end
+
+  private
+
+  def start_vm( name_id, iso, headless = false )
     # create the new vm
-    `vboxmanage createvm --name #{name} --register`
-    `vboxmanage modifyvm #{name} --ostype "Other"`
-    `vboxmanage storagectl #{name} --name "IDE Controller" --add ide --bootable on`
-    `vboxmanage storageattach #{name} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
-    `vboxmanage modifyvm #{name} --nic1 nat`
-    `vboxmanage modifyvm #{name} --nic2 hostonly --hostonlyadapter2 vboxnet0`
+    `vboxmanage createvm --name #{name_id} --register`
+    `vboxmanage modifyvm #{name_id} --ostype "Other"`
+    `vboxmanage storagectl #{name_id} --name "IDE Controller" --add ide --bootable on`
+    `vboxmanage storageattach #{name_id} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
+    `vboxmanage modifyvm #{name_id} --nic1 nat`
+    `vboxmanage modifyvm #{name_id} --nic2 hostonly --hostonlyadapter2 vboxnet0`
     hl = (headless) ? '--type headless' : ''
-    `vboxmanage startvm #{name} #{hl}`
+    `vboxmanage startvm #{name_id} #{hl}`
   end
 
   def find_name_for( iso )
     base = File::basename iso, '.iso'
     allowed_chars = /[a-z0-9_+-]+/i
-    name = VM_PREFIX + base.scan(allowed_chars).join('')
+    name = base.scan(allowed_chars).join('')
 
     vms = list_vms
     return name if not vms.include? name
@@ -74,9 +84,7 @@ module Livecd
     "#{name}-#{i}"
   end
 
-  def run_iso( iso, opts )
-    name = find_name_for iso
-    puts "starting vm #{name} (#{iso})"
-    start_vm name, iso, opts[:headless]
+  def id(name)
+    VM_PREFIX + name.to_s
   end
 end
