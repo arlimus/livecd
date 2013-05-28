@@ -1,7 +1,7 @@
 spec = Gem::Specification.new do |s|
   s.name = 'livecd'
   s.licenses = ['MPLv2']
-  s.version = '0.3'
+  s.version = '0.4'
   s.platform = Gem::Platform::RUBY
   s.summary = "run livecds easily"
   s.description = s.summary
