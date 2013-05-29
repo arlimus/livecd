@@ -1,0 +1,6 @@
+0.5: bufix incorrect require path
+0.4: extracted logic into lib
+     use thor instead of optparse
+0.3: integrate livecd prefix for vms (ie hide it from users)
+0.2: split out of tools project ~> rename to livecd
+0.1: initial release, start/stop/list livecds
