@@ -29,3 +29,8 @@ livecd stop cd_a
 # or stop all:
 livecd stop
 ```
+
+installation
+------------
+
+    gem install livecd
