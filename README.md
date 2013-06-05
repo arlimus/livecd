@@ -1,6 +1,6 @@
 livecd
 ======
-[![Build Status](https://travis-ci.org/arlimus/livecd.png?branch=nightly)](https://travis-ci.org/arlimus/livecd)
+[![Build Status](https://travis-ci.org/arlimus/livecd.png)](https://travis-ci.org/arlimus/livecd)
 
 Run a livecd quickly and easily. Uses virtualbox for magic.
 
@@ -29,3 +29,8 @@ livecd stop cd_a
 # or stop all:
 livecd stop
 ```
+
+installation
+------------
+
+    gem install livecd
