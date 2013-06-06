@@ -30,9 +30,12 @@ module Livecd
 
   def stop_vm( name )
     # if it exists:
-    puts "stopping vm #{name}"
     if exists_vm?(name)
-      `vboxmanage controlvm #{id(name)} poweroff`
+
+      if get_vm_state(name) != 'PoweredOff'
+        puts "stopping vm #{name}"
+        `vboxmanage controlvm #{id(name)} poweroff`
+      end
 
       for i in 1..4
         sleep 0.5
