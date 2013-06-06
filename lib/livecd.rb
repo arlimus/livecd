@@ -22,12 +22,33 @@ module Livecd
     list_vms.include? name
   end
 
+  def get_vm_state( name )
+    vboxinfo = `vboxmanage showvminfo --machinereadable livecd-webforpentester`
+    state = vboxinfo.match(/VMState=\"([^\"]+)\"/)
+    (state.nil?) ? nil : state[1]
+  end
+
   def stop_vm( name )
     # if it exists:
     puts "stopping vm #{name}"
     if exists_vm?(name)
       `vboxmanage controlvm #{id(name)} poweroff`
+
+      for i in 1..4
+        sleep 0.5
+        state = get_vm_state name
+        if state.nil?
+          puts "Can't get state for vm '#{name}'. It may already be destroyed."
+          break
+        elsif state == 'poweroff'
+          break
+        end
+      end
+
+      puts "removing vm #{name}"
       `vboxmanage unregistervm #{id(name)} --delete`
+    else
+      $stderr.puts "Can't find vm '#{name}' to stop it."
     end
   end
 
