@@ -1,5 +1,6 @@
 livecd
 ======
+[![Gem Version](https://badge.fury.io/rb/livecd.png)](http://badge.fury.io/rb/livecd)
 [![Build Status](https://travis-ci.org/arlimus/livecd.png)](https://travis-ci.org/arlimus/livecd)
 
 Run a livecd quickly and easily. Uses virtualbox for magic.
