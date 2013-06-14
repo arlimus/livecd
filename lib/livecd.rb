@@ -1,6 +1,6 @@
 
 module Livecd
-  VERSION = '0.8'
+  VERSION = '0.9'
   VM_PREFIX = 'livecd-'
 
   def list_vms
@@ -62,20 +62,21 @@ module Livecd
   def run_iso( iso, opts )
     name = find_name_for iso
     puts "starting vm #{name} (#{iso})"
-    start_vm id(name), iso, opts[:headless]
+    start_vm id(name), iso, opts
   end
 
   private
 
-  def start_vm( name_id, iso, headless = false )
+  def start_vm( name_id, iso, opts )
+    ram = (opts[:memory].nil?) ? '' : "--memory #{opts[:memory]}"
     # create the new vm
     `vboxmanage createvm --name #{name_id} --register`
-    `vboxmanage modifyvm #{name_id} --ostype "Other"`
+    `vboxmanage modifyvm #{name_id} --ostype "Other" #{ram}`
     `vboxmanage storagectl #{name_id} --name "IDE Controller" --add ide --bootable on`
     `vboxmanage storageattach #{name_id} --storagectl "IDE Controller" --port 0 --device 1 --type dvddrive --medium "#{iso}"`
     `vboxmanage modifyvm #{name_id} --nic1 nat`
     `vboxmanage modifyvm #{name_id} --nic2 hostonly --hostonlyadapter2 vboxnet0`
-    hl = (headless) ? '--type headless' : ''
+    hl = (opts[:headless]) ? '--type headless' : ''
     `vboxmanage startvm #{name_id} #{hl}`
   end
 
