@@ -35,3 +35,9 @@ installation
 ------------
 
     gem install livecd
+
+
+kudos / contributions
+---------------------
+
+* chris-rock
