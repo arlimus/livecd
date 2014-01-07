@@ -5,6 +5,14 @@ livecd
 
 Run a livecd quickly and easily. Uses virtualbox for magic.
 
+installation
+------------
+
+    gem install livecd
+
+usage
+-----
+
 ```bash
 livecd start myos.iso
 
@@ -12,6 +20,20 @@ livecd list
 # myos
 
 livecd stop
+```
+
+Quickstart:
+
+```bash
+# download damn small linux (http://www.damnsmalllinux.org/)
+wget http://distro.ibiblio.org/damnsmall/release_candidate/dsl-4.11.rc2.iso
+livecd start --memory 512 dsl-4.11.rc2.iso
+```
+
+Configure the memory. The default is 128 MB, but you can change it.
+
+```bash
+livecd --memory 512 myos.iso
 ```
 
 Run multiple livecds at the same time:
@@ -30,12 +52,6 @@ livecd stop cd_a
 # or stop all:
 livecd stop
 ```
-
-installation
-------------
-
-    gem install livecd
-
 
 kudos / contributions
 ---------------------
