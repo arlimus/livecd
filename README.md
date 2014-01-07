@@ -33,7 +33,7 @@ livecd start --memory 512 dsl-4.11.rc2.iso
 Configure the memory. The default is 128 MB, but you can change it.
 
 ```bash
-livecd --memory 512 myos.iso
+livecd start --memory 512 myos.iso
 ```
 
 Run multiple livecds at the same time:
