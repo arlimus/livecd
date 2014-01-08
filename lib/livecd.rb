@@ -1,6 +1,6 @@
 
 module Livecd
-  VERSION = '1.0'
+  VERSION = '1.0.1'
   VM_PREFIX = 'livecd-'
 
   def list_vms
