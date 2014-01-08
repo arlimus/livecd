@@ -6,7 +6,7 @@ require 'livecd'
 class LivecdCLI < Thor
   include Livecd
 
-  desc "start <mycd.iso>", "start the iso livecd"
+  desc "start [--memory 128] <mycd.iso>", "start the iso livecd"
   option :memory, type: :numeric, banner: 'how much memory the vm should get'
   def start(file)
     iso = File::expand_path( file )
