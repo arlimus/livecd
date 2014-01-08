@@ -1,3 +1,5 @@
+1.0.1: improved documentation
+       support rubnius 2.1.1
 1.0: added thor to gem dependencies
 0.9: made virtual machine memory configurable
 0.8: fixed bug where sometimes machines aren't removed the first time you run stop
